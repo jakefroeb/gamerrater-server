@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
 from gamerraterapi.models import Game, Category
+from django.contrib.auth.models import User
 
 
 class GameView(ViewSet):
@@ -31,12 +32,13 @@ class GameView(ViewSet):
     def retrieve(self, request, pk=None):
         try:
             game = Game.objects.get(pk=pk)
+            
             serializer = GameSerializer(game, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)
     def update(self, request, pk=None):
-        gamer = Gamer.objects.get(user=request.auth.user)
+        user=request.auth.user
         game = Game.objects.get(pk=pk)
         game.title = request.data["title"]
         game.creator = user
@@ -47,7 +49,7 @@ class GameView(ViewSet):
         game.age = request.data["age"]
         game.time = request.data["time"]
         categories = Category.objects.in_bulk(request.data["categories"])
-        game.categorie_set.set(categories)
+        game.category_set.set(categories)
         game.save()
         return Response({}, status=status.HTTP_204_NO_CONTENT)
     def destroy(self, request, pk=None):
@@ -64,9 +66,15 @@ class GameView(ViewSet):
         serializer = GameSerializer(
             games, many=True, context={'request': request})
         return Response(serializer.data)
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name')
+        
 class GameSerializer(serializers.ModelSerializer):
+    creator = UserSerializer(many=False)
+
     class Meta:
         model = Game
         fields = ('id', 'title','creator','description','designer','year','players','age','time','category_set')
-        depth = 2
+        depth = 1
