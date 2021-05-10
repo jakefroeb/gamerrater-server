@@ -6,5 +6,6 @@
             "name": "gamerrater",
             "database": "db.sqlite3"
         }
-    ]
+    ],
+    "python.pythonPath": "/Users/jakefroeb/.local/share/virtualenvs/levelup-rPGMaPdu/bin/python"
 }

@@ -32,7 +32,6 @@ class GameView(ViewSet):
     def retrieve(self, request, pk=None):
         try:
             game = Game.objects.get(pk=pk)
-            
             serializer = GameSerializer(game, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
@@ -73,8 +72,7 @@ class UserSerializer(serializers.ModelSerializer):
         
 class GameSerializer(serializers.ModelSerializer):
     creator = UserSerializer(many=False)
-
     class Meta:
         model = Game
-        fields = ('id', 'title','creator','description','designer','year','players','age','time','category_set')
+        fields = ('id', 'title','creator','description','designer','year','players','age','time','category_set','average_rating')
         depth = 1
