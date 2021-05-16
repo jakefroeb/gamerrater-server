@@ -7,6 +7,7 @@ from rest_framework import serializers
 from rest_framework import status
 from gamerraterapi.models import Game, Category
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 
 class GameView(ViewSet):
@@ -62,6 +63,13 @@ class GameView(ViewSet):
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     def list(self, request):
         games = Game.objects.all()
+        search_text = self.request.query_params.get('q', None)
+        sort_text = self.request.query_params.get('orderby', None)
+        if search_text is not None:
+            games = Game.objects.filter(Q(title__contains=search_text) | Q(description__contains=search_text) | Q(designer__contains=search_text))
+        if sort_text is not None:
+            games = Game.objects.order_by()
+
         serializer = GameSerializer(
             games, many=True, context={'request': request})
         return Response(serializer.data)
